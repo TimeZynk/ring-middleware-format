@@ -1,8 +1,7 @@
 (ns ring.middleware.test.format-response
   (:use [clojure.test]
         [ring.middleware.format-response])
-  (:require [cheshire.core :as json]
-            [clj-yaml.core :as yaml])
+  (:require [cheshire.core :as json])
   (:import [java.io ByteArrayInputStream]))
 
 (defn stream [s]
@@ -40,17 +39,6 @@
         resp (clojure-echo req)]
     (is (= body (read-string (slurp (:body resp)))))
     (is (.contains (get-in resp [:headers "Content-Type"]) "application/clojure"))
-    (is (< 2 (Integer/parseInt (get-in resp [:headers "Content-Length"]))))))
-
-(def yaml-echo
-  (wrap-yaml-response identity))
-
-(deftest format-yaml-hashmap
-  (let [body {:foo "bar"}
-        req {:body body}
-        resp (yaml-echo req)]
-    (is (= (yaml/generate-string body) (slurp (:body resp))))
-    (is (.contains (get-in resp [:headers "Content-Type"]) "application/x-yaml"))
     (is (< 2 (Integer/parseInt (get-in resp [:headers "Content-Length"]))))))
 
 (deftest can-encode?-accept-any-type
@@ -121,9 +109,7 @@
 (deftest format-restful-hashmap
   (let [body {:foo "bar"}]
     (doseq [accept ["application/clojure"
-                    "application/json"
-                    "application/x-yaml"
-                    "text/html"]]
+                    "application/json"]]
       (let [req {:body body :headers {"accept" accept}}
             resp (restful-echo req)]
         (is (.contains (get-in resp [:headers "Content-Type"]) accept))

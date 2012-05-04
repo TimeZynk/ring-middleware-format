@@ -1,6 +1,5 @@
 (ns ring.middleware.format-params
-  (:require [cheshire.core :as json]
-            [clj-yaml.core :as yaml]))
+  (:require [cheshire.core :as json]))
 
 (defn get-charset
   "Extracts charset from Content-Type header. utf-8 by default."
@@ -46,17 +45,6 @@
                    charset get-charset}}]
   (wrap-format-params handler :predicate predicate :decoder decoder :charset charset))
 
-(def yaml-request?
-  (make-type-request-pred #"^(application|text)/(vnd.+)?(x-)?yaml"))
-
-(defn wrap-yaml-params
-  "Handles body params in YAML format. See wrap-format-params for details."
-  [handler & {:keys [predicate decoder charset]
-              :or {predicate yaml-request?
-                   decoder yaml/parse-string
-                   charset get-charset}}]
-  (wrap-format-params handler :predicate predicate :decoder decoder :charset charset))
-
 (defn safe-read-string [str]
   "Parses clojure input using the reader in a safe manner by disabling eval in the reader."
   (binding [*read-eval* false]
@@ -79,5 +67,4 @@ It will deserialize to JSON, YAML or Clojure depending on Content-Type header. S
   [handler]
   (-> handler
       (wrap-json-params)
-      (wrap-clojure-params)
-      (wrap-yaml-params)))
+      (wrap-clojure-params)))

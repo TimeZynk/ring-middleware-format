@@ -2,7 +2,6 @@
   (:require [cheshire.core :as json]
             [ring.util.response :as res]
             [clojure.java.io :as io]
-            [clj-yaml.core :as yaml]
             [clojure.string :as s])
   (:use [clojure.core.memoize :only [memo-lu]])
   (:import [java.io File InputStream BufferedInputStream]))
@@ -170,40 +169,6 @@
                                     type)]
                         :charset charset))
 
-(defn wrap-yaml-response
-  "Wrapper to serialize structures in :body to YAML with sane
-  defaults. See wrap-format-response for more details."
-  [handler & {:keys [predicate encoder type charset]
-              :or {predicate serializable?
-                   encoder yaml/generate-string
-                   type "application/x-yaml"
-                   charset "utf-8"}}]
-  (wrap-format-response handler
-                        :predicate predicate
-                        :encoders [(make-encoder encoder type)]
-                        :charset charset))
-
-(defn- wrap-yaml-in-html
-  [body]
-  (str
-   "<html>\n<head></head>\n<body><div><pre>\n"
-   (yaml/generate-string body)
-   "</pre></div></body></html>"))
-
-(defn wrap-yaml-in-html-response
-  "Wrapper to serialize structures in :body to YAML wrapped in HTML to
-  check things out in the browser. See wrap-format-response for more
-  details."
-  [handler & {:keys [predicate encoder type charset]
-              :or {predicate serializable?
-                   encoder wrap-yaml-in-html
-                   type "text/html"
-                   charset "utf-8"}}]
-  (wrap-format-response handler
-                        :predicate predicate
-                        :encoders [(make-encoder encoder type)]
-                        :charset charset))
-
 (defn wrap-restful-response
   "Wrapper that tries to do the right thing with the response :body
   and provide a solid basis for a RESTful API. It will serialize to
@@ -216,11 +181,7 @@
                         :predicate serializable?
                         :encoders [(make-encoder json/generate-string
                                                  "application/json")
-                                   (make-encoder yaml/generate-string
-                                                 "application/x-yaml")
                                    (make-encoder generate-native-clojure
                                                  "application/clojure")
-                                   (make-encoder wrap-yaml-in-html
-                                                 "text/html")
                                    default]
                         :charset "utf-8"))
