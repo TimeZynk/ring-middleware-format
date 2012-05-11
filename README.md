@@ -31,7 +31,6 @@ These middlewares are mostly lifted from https://github.com/mmcgrana/ring-json-p
 There are three default wrappers:
 
 + _wrap-json-params_
-+ _wrap-yaml-params_
 + _wrap-clojure-params_
 
 There is also a generic _wrap-format-params_ on which the others depend. Each of these wrappers take 3 optional args: **:decoder**, **:predicate** and **:charset**. See _wrap-format-params_ doc for further details.
@@ -43,8 +42,6 @@ These middlewares will take a raw data structure returned by a route and seriali
 There are four default wrappers:
 
 + _wrap-json-response_
-+ _wrap-yaml-response_
-+ _wrap-yaml-in-html-response_ (responds to **text/html** MIME type and useful to test an API in the browser)
 + _wrap-clojure-response_
 
 There is also a generic _wrap-format-response_ on which the others depend. Each of these wrappers take 3 optional args: **:encoders**, **:predicate**, and **:charset**. See _wrap-format-response_ doc for further details.
