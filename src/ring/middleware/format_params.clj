@@ -37,11 +37,14 @@
 (def json-request?
   (make-type-request-pred #"^application/(vnd.+)?json"))
 
+(defn json-parse-string [s]
+  (json/parse-string s true))
+
 (defn wrap-json-params
   "Handles body params in JSON format. See wrap-format-params for details."
   [handler & {:keys [predicate decoder charset]
               :or {predicate json-request?
-                   decoder json/parse-string
+                   decoder json-parse-string
                    charset get-charset}}]
   (wrap-format-params handler :predicate predicate :decoder decoder :charset charset))
 
